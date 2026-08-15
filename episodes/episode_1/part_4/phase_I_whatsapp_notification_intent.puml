@@ -1,0 +1,47 @@
+@startuml phase_I_whatsapp_notification_intent
+title ENT-WA — Ciclo de vida da Intenção de Notificação via WhatsApp\nChave lógica: (order_identity, update_meaning)
+
+skinparam shadowing false
+
+[*] --> RECEIVED : gatilho do CTR-002 recebido\n(Pedidos → Adaptador)
+
+RECEIVED --> EVALUATING_ELIGIBILITY : Adaptador inicia as verificações de elegibilidade
+
+EVALUATING_ELIGIBILITY --> NOT_ELIGIBLE_MOMENT : o momento não é\nequivalente ao gatilho de e-mail
+EVALUATING_ELIGIBILITY --> RESOLVING_ADDRESS : o momento está dentro do escopo
+
+RESOLVING_ADDRESS --> NOT_ELIGIBLE_RECIPIENT : endereçamento ausente\nou inutilizável (CTR-003)
+RESOLVING_ADDRESS --> SUBMITTING : endereçamento disponível\n(+ gate de envio permitido\nquando o MR-005 for definido)
+
+SUBMITTING --> SEND_SUCCESS : provedor aceita a submissão\n(CTR-004)
+SUBMITTING --> SEND_FAILURE : rejeição do provedor /\ntimeout / falha de submissão
+
+SEND_FAILURE --> RETRYING : falha passível de retry\n(FLOW-RR; limites a definir)
+SEND_FAILURE --> SEND_FAILURE_TERMINAL : não passível de retry\nou retries esgotados\n(detalhe de política → Phase J)
+
+RETRYING --> SUBMITTING : tentativa de retry\nmesmo (pedido, atualização)
+
+SEND_SUCCESS --> [*]
+NOT_ELIGIBLE_MOMENT --> [*]
+NOT_ELIGIBLE_RECIPIENT --> [*]
+SEND_FAILURE_TERMINAL --> [*]
+
+SEND_SUCCESS : sucesso / terminal
+NOT_ELIGIBLE_MOMENT : terminal (suprimido)
+NOT_ELIGIBLE_RECIPIENT : terminal (suprimido)
+SEND_FAILURE : falha (pode retentar)
+RETRYING : retry
+SEND_FAILURE_TERMINAL : falha / terminal
+
+note right of SEND_SUCCESS
+  CTR-002 duplicado para a mesma chave
+  enquanto em SEND_SUCCESS: permanece aqui
+  (sem reenvio) — FLOW-ID
+end note
+
+note right of SEND_FAILURE
+  O status do e-mail nunca deve
+  ser copiado para este ciclo de vida.
+end note
+
+@enduml
