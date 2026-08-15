@@ -37,8 +37,8 @@ Apenas alguns dos resultados necessários para a Parte 4 são publicados aqui:
 
 | Ordem | Arquivo | Propósito |
 |-------|------|---------|
-| 1 | [whatsapp-notification-intent.puml](./02-phase-i-whatsapp-notification-intent.puml) | PlantUML: máquina de estados da Intenção de Notificação via WhatsApp |
-| 2 | [failure-recovery-policy.md](./04-phase-j-failure-recovery-policy.md) | Mapa de domínio de falhas, a tabela de falha e recuperação das 13 categorias, decisões formais, e decisões não resolvidas |
+| 1 | [whatsapp_notification_intent.puml](./whatsapp_notification_intent.puml) | PlantUML: máquina de estados da Intenção de Notificação via WhatsApp |
+| 2 | [failure_recovery_policy.md](./failure_recovery_policy.md) | Mapa de domínio de falhas, a tabela de falha e recuperação das 13 categorias, decisões formais, e decisões não resolvidas |
 
 
 ## Como ler
