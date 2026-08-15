@@ -1,0 +1,35 @@
+@startuml phase_G_end_to_end
+title FLOW-E2E — Fluxo de Negócio Ponta a Ponta\nAtualização de pedido percebida pelo cliente por e-mail e WhatsApp
+
+actor "Negócio / Ciclo de vida do pedido" as Biz
+participant "Pedidos" as Orders
+participant "Notificações por E-mail" as Email
+participant "Adaptador de Canal do WhatsApp" as Adapter
+participant "Gestão de Clientes" as CM
+participant "API do Provedor de WhatsApp" as Provider
+actor "Cliente Final" as Customer
+
+Biz -> Orders : momento do ciclo de vida\ndo pedido ocorre (dentro do escopo)
+Orders -> Orders : identidade do pedido +\nsignificado da atualização disponíveis
+
+Orders -> Email : notificar (existente)
+Email -> Customer : atualização de pedido por e-mail
+
+Orders -> Adapter : notificar (mesmo momento)
+Adapter -> Adapter : momento elegível?
+Adapter -> CM : endereçamento do cliente final
+CM --> Adapter : endereçamento
+Adapter -> Provider : submeter atualização\nde pedido via WhatsApp
+Provider --> Adapter : aceitar
+Adapter -> Adapter : SEND_SUCCESS visível
+Provider -> Customer : atualização de pedido via WhatsApp
+
+Customer -> Customer : recebe a atualização\nde pedido relevante em um\ncanal com maior chance\nde ser percebido
+
+note over Biz, Customer
+  Propósito de negócio: reduzir atualizações de pedido perdidas
+  complementando o e-mail com o WhatsApp,
+  sem alterar a experiência de e-mail.
+end note
+
+@enduml

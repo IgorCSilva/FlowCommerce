@@ -1,0 +1,26 @@
+@startuml phase_G_idempotency
+title FLOW-ID — Duplicata / Idempotência\nA mesma intenção de notificação de pedido+atualização não deve enviar em duplicidade
+
+participant "Pedidos" as Orders
+participant "Adaptador de Canal do WhatsApp" as Adapter
+participant "API do Provedor de WhatsApp" as Provider
+actor "Cliente Final" as Customer
+
+Orders -> Adapter : atualização dentro do escopo U\npara o pedido O (entrega 1)
+Adapter -> Provider : submeter (O, U)
+Provider --> Adapter : aceito
+Adapter -> Adapter : registrar SEND_SUCCESS\npara a chave (O, U)
+Provider -> Customer : mensagem via WhatsApp
+
+Orders -> Adapter : entrega duplicada\ndo mesmo (O, U)
+Adapter -> Adapter : decidir: já foi\nsubmetido com sucesso\npara (O, U)?
+Adapter -> Adapter : suprimir submissão duplicada\nmanter SEND_SUCCESS
+Adapter -[hidden]-> Provider
+
+note over Adapter, Provider
+  Chave de idempotência (lógica): identidade do pedido +
+  significado da atualização / momento da notificação.
+  A duplicata não deve produzir uma segunda mensagem ao cliente.
+end note
+
+@enduml
